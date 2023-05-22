@@ -1,0 +1,167 @@
+# Pr4
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+class Program
+{
+    static string filePath = "software_archive.txt"; 
+
+    static void Main()
+    {
+        while (true)
+        {
+            Console.WriteLine("1. Додати запис");
+            Console.WriteLine("2. Редагувати запис");
+            Console.WriteLine("3. Видалити запис");
+            Console.WriteLine("4. Вивести всю iнформацiю");
+            Console.WriteLine("5. Пошук за назвою програми");
+            Console.WriteLine("6. Вийти");
+            Console.WriteLine("7. Очистити");
+            Console.Write("Виберiть опцiю: ");
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "7":
+                    Console.Clear();
+                    break;
+                case "1":
+                    AddRecord();
+                    break;
+                case "2":
+                    EditRecord();
+                    break;
+                case "3":
+                    DeleteRecord();
+                    break;
+                case "4":
+                    DisplayRecords();
+                    break;
+                case "5":
+                    SearchByName();
+                    break;
+                case "6":
+                    return;
+                default:
+                    Console.WriteLine("Невірний вибір. Спробуйте ще раз.");
+                    break;
+            }
+
+            Console.WriteLine();
+        }
+    }
+
+    static void AddRecord()
+    {
+        Console.Write("Введіть назву програми: ");
+        string name = Console.ReadLine();
+
+        Console.Write("Введіть операційну систему: ");
+        string os = Console.ReadLine();
+
+        Console.Write("Введіть розмір програми: ");
+        string size = Console.ReadLine();
+
+        Console.Write("Введіть дату запису: ");
+        string date = Console.ReadLine();
+
+        string record = $"{name},{os},{size},{date}";
+
+        using (StreamWriter writer = File.AppendText(filePath))
+        {
+            writer.WriteLine(record);
+        }
+
+        Console.WriteLine("Запис успішно додано.");
+    }
+
+    static void EditRecord()
+    {
+        Console.Write("Введіть номер запису для редагування: ");
+        int recordNumber = int.Parse(Console.ReadLine());
+
+
+        string[] lines = File.ReadAllLines(filePath);
+
+        if (recordNumber >= 0 && recordNumber < lines.Length)
+        {
+            Console.Write("Введіть нову назву програми: ");
+            string name = Console.ReadLine();
+
+            Console.Write("Введіть нову операційну систему: ");
+            string os = Console.ReadLine();
+
+            Console.Write("Введіть новий розмір програми: ");
+            string size = Console.ReadLine();
+
+            Console.Write("Введіть нову дату запису: ");
+            string date = Console.ReadLine();
+
+            string record = $"{name},{os},{size},{date}";
+
+
+            lines[recordNumber] = record;
+            File.WriteAllLines(filePath, lines);
+
+            Console.WriteLine("Запис успiшно змiнено.");
+        }
+        else
+        {
+            Console.WriteLine("Невірний номер запису.");
+        }
+    }
+
+    static void DeleteRecord()
+    {
+        Console.Write("Введіть номер запису для видалення: ");
+        int recordNumber = int.Parse(Console.ReadLine());
+
+        string[] lines = File.ReadAllLines(filePath);
+
+        if (recordNumber >= 0 && recordNumber < lines.Length)
+        {
+            List<string> records = new List<string>(lines);
+            records.RemoveAt(recordNumber);
+            File.WriteAllLines(filePath, records.ToArray());
+
+            Console.WriteLine("Запис успішно видалено.");
+        }
+        else
+        {
+            Console.WriteLine("Невірний номер запису.");
+        }
+    }
+
+    static void DisplayRecords()
+    {
+        string[] lines = File.ReadAllLines(filePath);
+
+        Console.WriteLine("Архів програмного забезпечення:");
+        for (int i = 0; i < lines.Length; i++)
+        {
+            Console.WriteLine($"{i}. {lines[i]}");
+        }
+    }
+
+    static void SearchByName()
+    {
+        Console.Write("Введіть назву програми для пошуку: ");
+        string searchName = Console.ReadLine();
+
+
+        string[] lines = File.ReadAllLines(filePath);
+
+        Console.WriteLine("Результати пошуку:");
+        for (int i = 0; i < lines.Length; i++)
+        {
+            string[] fields = lines[i].Split('-');
+            string name = fields[0];
+
+            if (name.Contains(searchName))
+            {
+                Console.WriteLine($"{i}. {lines[i]}");
+            }
+        }
+    }
+}
